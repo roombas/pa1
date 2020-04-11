@@ -12,9 +12,9 @@
 
 char* strndup(const char *s, size_t n);
 int strcmp(const char *str1, const char *str2);
+size_t strlen(const char *str);
 char* compare(char **a, char **b);
 void sortList(List L, char **arr, int size);
-void swapNodes(List L, int newdata);
 
 int main(int argc, char *argv[]) {
 
@@ -32,13 +32,10 @@ int main(int argc, char *argv[]) {
 
 		//dynamic array of pointers
 		char **arrwords = malloc(MAX_LENGTH * sizeof(int*));
-		for (int x = 0; x < MAX_LENGTH; x++) {
-			arrwords[x] = malloc(sizeof(int*));
-		}
 
 		//if first precondition is passed, reads user input for files
 		in = fopen(argv[1], "r");
-		out = fopen(argv[2], "r+");
+		out = fopen(argv[2], "w");
 
 		//if input file cannot be found, exit program
 		if (in == NULL) {
@@ -68,47 +65,41 @@ int main(int argc, char *argv[]) {
 		printf("Characters: %d\n", count);
 		if (fseek(in, 0L, SEEK_SET) != 0) {
 			printf("Repositioning error. Exiting program.\n");
+			exit(EXIT_FAILURE);
 		}
 
 		//reads txt file and places string pointers into array
 		while (fgets(line, WORD_LENGTH, in) != NULL) {
 			//doubles size of array if reaching max length
-			if (MAX_LENGTH < count) {
+			if (MAX_LENGTH < newline + 1) {
 				arrwords = (char**) realloc(arrwords, MAX_LENGTH * 2);
 				MAX_LENGTH = MAX_LENGTH * 2;
+			}
+			int len = strlen(line);
+			if (line[len - 1] == '\n') {
+				line[len - 1] = '\0';
 			}
 			arrwords[i] = strndup(line, WORD_LENGTH);
 			i++;
 		}
 
-		/*if (newline == 0) {
-			printf("%s", *arrwords);
-		} else {
-			for (int j = 0; j < newline + 1; j++)
-				printf("%s", *(arrwords + j));
-		}
-		printf("\n");*/
-
 		//create new linked list, insert pointers into list alphabetically
 		List A = newList();
-		//printf("%s", compare((arrwords), (arrwords + 1)));
 
 		sortList(A, arrwords, newline + 1);
+		printList(stdout, A);
 
-		printf("\n");
-		if (newline == 0) {
-			printf("%s", *arrwords);
-		} else {
-			for (int j = 0; j < newline + 1; j++)
-				printf("%s", *(arrwords + j));
+		for (moveFront(A); index(A) >= 0; moveNext(A)) {
+			printf("%d ", get(A));
+			fprintf(out, "%s\n", *(arrwords + get(A)));
 		}
-		printf("\n");
 
 		//free memory, close files
 		for (int x = 0; x < MAX_LENGTH; x++) {
 			free(arrwords[x]);
 		}
 		free(arrwords);
+		freeList(&A);
 		fclose(in);
 		fclose(out);
 		return (0);
@@ -117,11 +108,11 @@ int main(int argc, char *argv[]) {
 
 char* compare(char **a, char **b) {
 	if (strcmp(*(a), *(b)) < 0) {
-		printf("String a > b\n");
+		printf("String a < b\n");
 		return *(a);
 	}
 	if (strcmp(*(a), *(b)) > 0) {
-		printf("String a < b\n");
+		printf("String a > b\n");
 		return *(b);
 	} else {
 		printf("Strings are identical\n");
@@ -131,37 +122,92 @@ char* compare(char **a, char **b) {
 
 void sortList(List L, char **arr, int size) {
 
-	int x = 0;
-	while (length(L) < size) {
-		append(L, x);
-		printf("%d\n", length(L) - 1);
-		printf("%s\n", *(arr + x));
-		x++;
-	}
-	printList(stdout, L);
-	moveFront(L);
+	prepend(L, 0);
+	 moveFront(L);
+	 int i = 1;
 
-	/*	for(int i = 1; i < size; i++)
+	for ( ; i < size; i++) {
+		//char * key = *(arr + get(L));
+		char *cursorVar = *(arr + get(L)); //cursor element, check all cursor elements on right
+		//side for greater or less than array current element
+		char *comparedVar = *(arr + i); //array current element whose
+										//right side is checked for correct position
+		int cmp = strcmp(comparedVar, cursorVar); //if cmp < 0, comparedVar < cursorVar
+												  //if cmp > 0, cursorVar < comparedVar
+
+		/*while(cmp >= 0 && index(L) != -1)
+		{
+			moveNext(L);
+		}
+		if(length(L) > 0 && index(L) >= 0)
+		{
+			insertAfter(L, i);
+		}
+		else
+			append(L, i);
+
+		moveFront(L);*/
+
+		while (cmp > 0 && index(L) != -1) {
+			moveNext(L);
+		}
+		//if cursor reaches end, comparedVar > all cursor variables
+		if (index(L) == -1) {
+			printf("***APPEND*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
+			append(L, i);
+		}
+		if (cmp < 0) {
+			printf("***INSERTBEFORE <=0*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
+			insertBefore(L, i);
+		}
+		else if(cmp == 0)
+		{
+			printf("***INSERTBEFORE==0*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
+			insertBefore(L, i);
+		}
+		//else
+		//	append(L, i);
+		moveFront(L);
+
+		/*
+		 if (cmp >= 0)
+		 {
+		 insertBefore(L, i);
+		 }
+		 else if(cmp < 0)
+		 {
+		 insertAfter(L, i);
+		 }
+		 else if(index(L) == -1)
+		 {
+		 append(L, i);
+		 }
+		 moveFront(L);
+		 i++;*/
+	}
+
+	/*while(i < size)
 	 {
-	 char * key = *(arr + i);
-	 int j = i - 1;
-	 while(j >= 0 && strcmp(key, *(arr + j)) < 0)
+	 char * key = *(arr + get(L));
+	 char * key2 = *(arr + i);
+	 int cmp = strcmp( key, key2);
+
+	 //if(length(L) == size)
+	 //	return;
+
+	 if (cmp >= 0)
 	 {
-	 *(arr + (j + 1)) = *(arr + j);
-	 j--;
+	 insertBefore(L, i);
 	 }
-	 *(arr + (j + 1)) = key;
+	 else if(cmp < 0)
+	 {
+	 insertAfter(L, i);
+	 }
+	 else if(index(L) == -1)
+	 {
+	 append(L, i);
+	 }
+	 moveFront(L);
+	 i++;
 	 }*/
 }
-
- void swapNodes(List L, int newdata)
- {
-	 insertBefore(L, newdata);
-	 int size = index(L);
-	 delete(L);
-	 moveFront(L);
-	 for(int i = 0; i < size; i++)
-	 {
-		 moveNext(L);
-	 }
- }

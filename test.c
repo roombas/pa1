@@ -12,6 +12,7 @@
 
 char* strndup(const char *s, size_t n);
 int strcmp(const char *str1, const char *str2);
+char* strcpy(char* destination, const char* source);
 size_t strlen(const char *str);
 void sortList(List L, char **arr, int size);
 
@@ -125,7 +126,14 @@ void sortList(List L, char **arr, int size) {
 		char *comparedVar = *(arr + i);    //array current element whose
 										   //right side is checked for correct position
 
-		while ((cmp = strcmp(*(arr + i), cursorVar)) > 0 && index(L) != -1) {
+		char string1[100];
+		char string2[100];
+		strcpy(string1, *(arr+i));
+		strcpy(string2, *(arr + get(L)));
+		cmp = strcmp(string1, string2);
+		printf("%s, %s, %d\n", string1, string2, cmp );
+
+		while ((cmp = strcmp(string1, string2)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
 			printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
 					*(arr + i), i, cursorVar, get(L), cmp);

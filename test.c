@@ -8,6 +8,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<ctype.h>
+#include<string.h>
 #include "List.h"
 
 char* strndup(const char *s, size_t n);
@@ -126,14 +127,15 @@ void sortList(List L, char **arr, int size) {
 		char *comparedVar = *(arr + i);    //array current element whose
 										   //right side is checked for correct position
 
-		char string1[100];
-		char string2[100];
+		char string1[100] = "string1";
+		char string2[100] = "string2";
+		cmp = strncmp(string1, string2, 100);
+
 		strcpy(string1, *(arr+i));
 		strcpy(string2, *(arr + get(L)));
-		cmp = strcmp(string1, string2);
 		printf("================ %s, %s, %d\n", string1, string2, cmp );
 
-		while ((cmp = strcmp(string1, string2)) > 0 && index(L) != -1) {
+		while ((cmp = strncmp(string1, string2, 100)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
 			/*printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
 					*(arr + i), i, cursorVar, get(L), cmp);*/

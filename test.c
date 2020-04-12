@@ -8,12 +8,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<ctype.h>
-#include<string.h>
 #include "List.h"
 
 char* strndup(const char *s, size_t n);
 int strcmp(const char *str1, const char *str2);
-char* strcpy(char* destination, const char* source);
 size_t strlen(const char *str);
 void sortList(List L, char **arr, int size);
 
@@ -127,19 +125,11 @@ void sortList(List L, char **arr, int size) {
 		char *comparedVar = *(arr + i);    //array current element whose
 										   //right side is checked for correct position
 
-		char string1[100] = "string1";
-		char string2[100] = "string2";
-		cmp = strncmp(string1, string2, 100);
-
-		strcpy(string1, *(arr+i));
-		strcpy(string2, *(arr + get(L)));
-		printf("================ %s, %s, %d\n", string1, string2, cmp );
-
-		while ((cmp = strncmp(string1, string2, 100)) > 0 && index(L) != -1) {
+		while ((cmp = strcmp(*(arr + i), cursorVar)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
-			/*printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
-					*(arr + i), i, cursorVar, get(L), cmp);*/
-			printf("%s, %s, %d\n", string1, string2, cmp );
+			comparedVar = *(arr + i)
+			printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
+					comparedVar, i, cursorVar, get(L), cmp);
 			moveNext(L);
 		}
 		if (index(L) != -1)
@@ -152,7 +142,7 @@ void sortList(List L, char **arr, int size) {
 				cursorVar = *(arr + get(L));
 				printf(
 						"***MOVEBACK cmp %d < 0 index == -1*** insert %i (%s) before cursorVar %d (%s)\n",
-						cmp, i, *(arr + i), get(L), cursorVar);
+						cmp, i, comparedVar, get(L), cursorVar);
 				insertBefore(L, i);
 
 
@@ -163,7 +153,7 @@ void sortList(List L, char **arr, int size) {
 				printf("--------------------cmp < 0 insertBefore--------------------\n");
 				printf(
 						"***cmp %d < 0 *** insert %i (%s) before cursorVar %d (%s)\n",
-						cmp, i, *(arr + i), get(L), cursorVar);
+						cmp, i, comparedVar, get(L), cursorVar);
 				insertBefore(L, i);
 			}
 		} else if ((cmp = strcmp(*(arr + i), cursorVar)) > 0) {
@@ -179,7 +169,7 @@ void sortList(List L, char **arr, int size) {
 			} else {
 				printf(
 						"***APPEND *** cmp = %d insert: %i (%s) at end of list\n",
-						cmp, i, *(arr + i));
+						cmp, i, comparedVar);
 				insertAfter(L, i);
 			}
 		} else {

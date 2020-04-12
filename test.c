@@ -13,7 +13,6 @@
 char* strndup(const char *s, size_t n);
 int strcmp(const char *str1, const char *str2);
 size_t strlen(const char *str);
-char* compare(char **a, char **b);
 void sortList(List L, char **arr, int size);
 
 int main(int argc, char *argv[]) {
@@ -86,19 +85,17 @@ int main(int argc, char *argv[]) {
 		//create new linked list, insert pointers into list alphabetically
 		List A = newList();
 		sortList(A, arrwords, newline + 1);
-		printList(stdout, A);
 
-
-		for(i = 0; i < newline + 1; i++)
-		{
-			printf("%s", *(arrwords + i));
-			printf("\n");
-		}
-		printf("---------------------------------------\n");
+		/*for(i = 0; i < newline + 1; i++)
+		 {
+		 printf("%s", *(arrwords + i));
+		 printf("\n");
+		 }
+		 printf("---------------------------------------\n");*/
 
 		for (moveFront(A); index(A) >= 0; moveNext(A)) {
-			printf("%d", get(A));
-			fprintf(stdout, "%s\n", *(arrwords + get(A)));
+			printf("%d ", get(A));
+			fprintf(stdout, "%s \n", *(arrwords + get(A)));
 		}
 
 		//free memory, close files
@@ -113,64 +110,70 @@ int main(int argc, char *argv[]) {
 	}
 }
 
-char* compare(char **a, char **b) {
-	if (strcmp(*(a), *(b)) < 0) {
-		printf("String a < b\n");
-		return *(a);
-	}
-	if (strcmp(*(a), *(b)) > 0) {
-		printf("String a > b\n");
-		return *(b);
-	} else {
-		printf("Strings are identical\n");
-		return (*(a));
-	}
-}
-
 void sortList(List L, char **arr, int size) {
 
-
+	prepend(L, 0);
+	moveFront(L);
+	printf("FRONT INITIALIZATION: %d \n", get(L));
 	for (int i = 1; i < size; i++) {
 
-		if(isEmpty(L))
-		{
-			prepend(L, 0);
-			moveFront(L);
-			printf("FRONT INITIALIZATION: %d \n", get(L));
-		}
+		int cmp; //if cmp < 0, comparedVar < cursorVar
+				 //if cmp > 0, cursorVar < comparedVar. Continue moving next until cursorvar > comparedVar.
 
 		char *cursorVar = *(arr + get(L)); //cursor element, check all cursor elements on right
 										   //side for greater or less than array current element
 		char *comparedVar = *(arr + i);    //array current element whose
 										   //right side is checked for correct position
-		int cmp; //if cmp < 0, comparedVar < cursorVar
-				 //if cmp > 0, cursorVar < comparedVar
-		while ((cmp = strcmp(comparedVar, cursorVar)) > 0 && index(L) != -1) {
-			//printf("( %s | %s | %d | get(L)%d)\n", cursorVar, comparedVar, strcmp(comparedVar, cursorVar), get(L));
+
+		while ((cmp = strcmp(*(arr + i), cursorVar)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
-			printf("CursorVar: %s %d", cursorVar, get(L));
+			printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
+					*(arr + i), i, cursorVar, get(L), cmp);
 			moveNext(L);
 		}
-		//if cursor reaches end, comparedVar > all cursor variables
-		if (cmp < 0) {
-			if(index(L) == -1)
-			{
+		if (index(L) != -1)
+			cursorVar = *(arr + get(L));
+
+		if ((cmp = strcmp(*(arr + i), cursorVar)) < 0) {
+			//GOOD CONDITION
+			if (index(L) == -1) {
 				moveBack(L);
-				printf("CursorVar: %s %d", cursorVar, get(L));
-				//printf("MOVEBACK. insert %i (%s) before cursorVar %d (%s)\n", i, comparedVar, get(L), cursorVar);
+				cursorVar = *(arr + get(L));
+				printf(
+						"***MOVEBACK cmp %d < 0 index == -1*** insert %i (%s) before cursorVar %d (%s)\n",
+						cmp, i, *(arr + i), get(L), cursorVar);
+				insertBefore(L, i);
+
+
+				//CHECK CONDITION
+			} else {
+				cursorVar = *(arr + get(L));
+
+				printf("--------------------cmp < 0 insertBefore--------------------\n");
+				printf(
+						"***cmp %d < 0 *** insert %i (%s) before cursorVar %d (%s)\n",
+						cmp, i, *(arr + i), get(L), cursorVar);
+				insertBefore(L, i);
 			}
-			printf("----------------------------------------\n");
-			//printf("***cmp < 0 *** insert %i (%s) before cursorVar %d (%s)\n", i, comparedVar, get(L), cursorVar);
-			printf("CursorVar: %s %d", cursorVar, get(L));
-			insertBefore(L, i);
-		}
-		else
-		{
-			printf("----------------------------------------\n");
-			if(index(L) != -1)
-			printf("CursorVar: %s %d\n", cursorVar, get(L));
-			//printf("***APPEND *** insert: %i (%s) at end of list\n", i, comparedVar);
-			append(L, i);
+		} else if ((cmp = strcmp(*(arr + i), cursorVar)) > 0) {
+
+			printf("ELSE STATEMENT END INDEX: %d ", index(L));
+			//printf("--------------------else APPEND--------------------\n");
+			if (index(L) == -1) {
+				printf("index == -1 ELSE STATEMENT\n");
+				//cursorVar = *(arr + get(L));
+				//printf("*** index != -1 && cmp = %d*** CursorVar: %s %d\n",
+				//		cmp, cursorVar, get(L));
+				append(L, i);
+			} else {
+				printf(
+						"***APPEND *** cmp = %d insert: %i (%s) at end of list\n",
+						cmp, i, *(arr + i));
+				insertAfter(L, i);
+			}
+		} else {
+			printf("LAST OPTION-----------------\n");
+			insertBefore(L,i);
 		}
 		moveFront(L);
 	}

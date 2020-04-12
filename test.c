@@ -131,12 +131,13 @@ void sortList(List L, char **arr, int size) {
 		strcpy(string1, *(arr+i));
 		strcpy(string2, *(arr + get(L)));
 		cmp = strcmp(string1, string2);
-		printf("%s, %s, %d\n", string1, string2, cmp );
+		printf("================ %s, %s, %d\n", string1, string2, cmp );
 
 		while ((cmp = strcmp(string1, string2)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
-			printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
-					*(arr + i), i, cursorVar, get(L), cmp);
+			/*printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
+					*(arr + i), i, cursorVar, get(L), cmp);*/
+			printf("%s, %s, %d\n", string1, string2, cmp );
 			moveNext(L);
 		}
 		if (index(L) != -1)

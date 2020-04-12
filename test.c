@@ -125,9 +125,10 @@ void sortList(List L, char **arr, int size) {
 		char *comparedVar = *(arr + i);    //array current element whose
 										   //right side is checked for correct position
 
-		while ((cmp = strcmp(*(arr + i), cursorVar)) > 0 && index(L) != -1) {
+		while ((cmp = strcmp(comparedVar, cursorVar)) > 0 && index(L) != -1) {
 			cursorVar = *(arr + get(L));
-			comparedVar = *(arr + i)
+			comparedVar = *(arr + i);
+			cmp = strcmp(comparedVar, cursorVar);
 			printf("LOOP ComparedVar: %s %d| CursorVar: %s %d | cmp: %d\n",
 					comparedVar, i, cursorVar, get(L), cmp);
 			moveNext(L);

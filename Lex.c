@@ -1,9 +1,8 @@
 //-----------------------------------------------------------------------------
 // Lex.c
 // Client for List ADT
-// Stephanie Lu
-// sqlu
-// pa1
+// Stephanie Lu, sqlu
+// 2020 Spring CSE101 PA1
 //-----------------------------------------------------------------------------
 #include<stdio.h>
 #include<stdlib.h>
@@ -13,8 +12,7 @@
 char* strndup(const char *s, size_t n);
 int strcmp(const char *str1, const char *str2);
 size_t strlen(const char *str);
-char* compare(char **a, char **b);
-void sortList(List L, char **arr, int size);
+void sortList(char ** arr, int size, FILE * out);
 
 int main(int argc, char *argv[]) {
 
@@ -27,7 +25,7 @@ int main(int argc, char *argv[]) {
 		FILE *in;
 		FILE *out;
 		int space = 0, newline = 0, count = 0, i = 0;
-		int MAX_LENGTH = 100, WORD_LENGTH = 100;
+		int MAX_LENGTH = 1000, WORD_LENGTH = 100;
 		char line[WORD_LENGTH];
 
 		//dynamic array of pointers
@@ -60,9 +58,7 @@ int main(int argc, char *argv[]) {
 				newline++;
 			c = fgetc(in);
 		}
-		printf("Spaces: %d\n", space);
-		printf("Newlines: %d\n", newline);
-		printf("Characters: %d\n", count);
+		printf("NEWLINE: %d\n", newline);
 		if (fseek(in, 0L, SEEK_SET) != 0) {
 			printf("Repositioning error. Exiting program.\n");
 			exit(EXIT_FAILURE);
@@ -71,143 +67,96 @@ int main(int argc, char *argv[]) {
 		//reads txt file and places string pointers into array
 		while (fgets(line, WORD_LENGTH, in) != NULL) {
 			//doubles size of array if reaching max length
-			if (MAX_LENGTH < newline + 1) {
+			/*while (MAX_LENGTH < newline) {
 				arrwords = (char**) realloc(arrwords, MAX_LENGTH * 2);
 				MAX_LENGTH = MAX_LENGTH * 2;
-			}
+			}*/
 			int len = strlen(line);
 			if (line[len - 1] == '\n') {
 				line[len - 1] = '\0';
 			}
-			arrwords[i] = strndup(line, WORD_LENGTH);
+			*(arrwords + i) = strndup(line, WORD_LENGTH);
 			i++;
 		}
 
-		//create new linked list, insert pointers into list alphabetically
-		List A = newList();
-
-		sortList(A, arrwords, newline + 1);
-		printList(stdout, A);
-
-		for (moveFront(A); index(A) >= 0; moveNext(A)) {
-			printf("%d ", get(A));
-			fprintf(out, "%s\n", *(arrwords + get(A)));
-		}
+		sortList(arrwords, newline, out);
 
 		//free memory, close files
-		for (int x = 0; x < MAX_LENGTH; x++) {
-			free(arrwords[x]);
-		}
-		free(arrwords);
-		freeList(&A);
+		/*for (int x = 0; x < MAX_LENGTH; x++) {
+			if((*arrwords + x) != NULL)
+			{
+			free(*(arrwords + x));
+			*(arrwords + x) = NULL;
+			}
+		}*/
 		fclose(in);
 		fclose(out);
+		free(arrwords);
 		return (0);
 	}
 }
 
-char* compare(char **a, char **b) {
-	if (strcmp(*(a), *(b)) < 0) {
-		printf("String a < b\n");
-		return *(a);
-	}
-	if (strcmp(*(a), *(b)) > 0) {
-		printf("String a > b\n");
-		return *(b);
-	} else {
-		printf("Strings are identical\n");
-		return (*(a));
-	}
-}
+void sortList(char ** arr, int size, FILE * out) {
 
-void sortList(List L, char **arr, int size) {
+	//create new linked list, insert pointers into list alphabetically
+	List L = newList();
 
 	prepend(L, 0);
-	 moveFront(L);
-	 int i = 1;
+	moveFront(L);
+	printf("INITIALIZATION\n");
+	for (int i = 1; i < size; i++) {
 
-	for ( ; i < size; i++) {
-		//char * key = *(arr + get(L));
-		char *cursorVar = *(arr + get(L)); //cursor element, check all cursor elements on right
-		//side for greater or less than array current element
-		char *comparedVar = *(arr + i); //array current element whose
-										//right side is checked for correct position
-		int cmp = strcmp(comparedVar, cursorVar); //if cmp < 0, comparedVar < cursorVar
-												  //if cmp > 0, cursorVar < comparedVar
+		int cmp; //if cmp < 0, comparedVar < cursorVar
+				 //if cmp > 0, cursorVar < comparedVar. Continue moving next until cursorvar > comparedVar.
 
-		/*while(cmp >= 0 && index(L) != -1)
-		{
-			moveNext(L);
+		//printf("BEFORE WHILE LOOP\n");
+		if (length(L) != 1) {
+			while ((cmp = strcmp(*(arr + i), *(arr + get(L)))) > 0
+					&& index(L) != -1) {
+				moveNext(L);
+				if(index (L) == -1)
+					break;
+				//printf("%s, %d \n", *(arr + get(L)), get(L));
+				//printf("LOOPING %d times, index = %d, length = %d\n", i, index(L), length(L));
+			}
 		}
-		if(length(L) > 0 && index(L) >= 0)
-		{
-			insertAfter(L, i);
-		}
-		else
-			append(L, i);
+		else if(length(L) == 1)
+			(cmp = strcmp(*(arr + i), *(arr + 0)));
 
-		moveFront(L);*/
-
-		while (cmp > 0 && index(L) != -1) {
-			moveNext(L);
-		}
-		//if cursor reaches end, comparedVar > all cursor variables
-		if (index(L) == -1) {
-			printf("***APPEND*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
-			append(L, i);
-		}
 		if (cmp < 0) {
-			printf("***INSERTBEFORE <=0*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
-			insertBefore(L, i);
-		}
-		else if(cmp == 0)
-		{
-			printf("***INSERTBEFORE==0*** cursorVar: %s | comparedVar: %s | cmp: %d\n", cursorVar, comparedVar, cmp);
-			insertBefore(L, i);
-		}
-		//else
-		//	append(L, i);
-		moveFront(L);
+			//printf("cmp < 0 i( %d ) \n", i);
+			if (index(L) == -1) {
+				//printf("INDEX == -1 cmp < 0 i( %d ) \n", i);
+				moveBack(L);
+				insertBefore(L, i);
 
-		/*
-		 if (cmp >= 0)
-		 {
-		 insertBefore(L, i);
-		 }
-		 else if(cmp < 0)
-		 {
-		 insertAfter(L, i);
-		 }
-		 else if(index(L) == -1)
-		 {
-		 append(L, i);
-		 }
-		 moveFront(L);
-		 i++;*/
+			} else {
+				//printf("INDEX != -1 cmp < 0 i( %d ) \n", i);
+				insertBefore(L, i);
+			}
+		} else if (cmp > 0) {
+
+			if (index(L) == -1) {
+				//printf("APPENDING cmp > 0 != -1 cmp < 0 i( %d ) \n", i);
+				append(L, i);
+			} else {
+				//printf("INSERTAFTER cmp > 0 != -1 cmp < 0 i( %d ) \n", i);
+				insertAfter(L, i);
+			}
+		} else {
+			//printf("LAST ELSE cmp > 0 != -1 cmp < 0 i( %d ) \n", i);
+			insertBefore(L, i);
+		}
+		//printf("BEFORE MOVEFRONT");
+		moveFront(L);
 	}
 
-	/*while(i < size)
-	 {
-	 char * key = *(arr + get(L));
-	 char * key2 = *(arr + i);
-	 int cmp = strcmp( key, key2);
+	for (moveFront(L); index(L) >= 0; moveNext(L)) {
+		//printf("%d ", get(L));
+		fprintf(out, "%s \n", *(arr + get(L)));
+	}
 
-	 //if(length(L) == size)
-	 //	return;
+	freeList(&L);
 
-	 if (cmp >= 0)
-	 {
-	 insertBefore(L, i);
-	 }
-	 else if(cmp < 0)
-	 {
-	 insertAfter(L, i);
-	 }
-	 else if(index(L) == -1)
-	 {
-	 append(L, i);
-	 }
-	 moveFront(L);
-	 i++;
-	 }*/
+
 }

@@ -82,16 +82,16 @@ int main(int argc, char *argv[]) {
 		sortList(arrwords, newline, out);
 
 		//free memory, close files
-		/*for (int x = 0; x < MAX_LENGTH; x++) {
+		for (int x = 0; x < MAX_LENGTH; x++) {
 			if((*arrwords + x) != NULL)
 			{
 			free(*(arrwords + x));
 			*(arrwords + x) = NULL;
 			}
-		}*/
+		}
+		free(arrwords);
 		fclose(in);
 		fclose(out);
-		free(arrwords);
 		return (0);
 	}
 }
@@ -138,8 +138,7 @@ void sortList(char ** arr, int size, FILE * out) {
 
 			if (index(L) == -1) {
 				//printf("APPENDING cmp > 0 != -1 cmp < 0 i( %d ) \n", i);
-				append(L, i);
-			} else {
+s			} else {
 				//printf("INSERTAFTER cmp > 0 != -1 cmp < 0 i( %d ) \n", i);
 				insertAfter(L, i);
 			}

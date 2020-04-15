@@ -9,7 +9,7 @@
 #include<stdlib.h>
 #include<ctype.h>
 #include "List.h"
-#define type long
+#define type int
 
 //contains definitions of all exported functions
 //private
@@ -114,7 +114,7 @@ int index(List L) {
 
 //get()
 // Returns cursor element of L. Pre: length()>0, index()>=0
-int get(List L) {
+type get(List L) {
 	if (L == NULL) {
 		printf("Cursor Error: calling get() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -126,16 +126,16 @@ int get(List L) {
 	return (L->cursor->data);
 }
 
-//equals()
+//listEquals()
 // Returns true (1) iff Lists A and B are in same
 // state, and returns false (0) otherwise.
-int equals(List A, List B) {
+int listEquals(List A, List B) {
 	int eq = 0;
 	Node N = NULL;
 	Node M = NULL;
 
 	if (A == NULL || B == NULL) {
-		printf("List Error: calling equals() on NULL List reference\n");
+		printf("List Error: calling listEquals() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -288,7 +288,6 @@ void prepend(List L, type data) {
 	if (isEmpty(L)) {
 		L->front = L->back = N;
 	} else {
-		N->prev = NULL;
 		N->next = L->front;
 		L->front->prev = N;
 		L->front = N;
@@ -303,16 +302,16 @@ void prepend(List L, type data) {
 // Insert new element into L. If L is non-empty,
 // insertion takes place after back element.
 void append(List L, type data) {
-	Node N = newNode(data);
 
 	if (L == NULL) {
 		printf("List Error: calling append() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("NODE SIZE %lu", sizeof(NodeObj));
+	Node N = newNode(data);
 	if (isEmpty(L)) {
 		L->front = L->back = N;
 	} else {
-		N->next = NULL;
 		N->prev = L->back;
 		L->back->next = N;
 		L->back = N;
@@ -324,7 +323,6 @@ void append(List L, type data) {
 // Insert new element before cursor.
 // Pre: length()>0, index()>=0
 void insertBefore(List L, type data) {
-	Node N = newNode(data);
 	if (L == NULL) {
 		printf("List Error: calling insertBefore() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -338,6 +336,7 @@ void insertBefore(List L, type data) {
 				"List Error: calling insertBefore() while cursor is undefined\n");
 		exit(EXIT_FAILURE);
 	} else {
+		Node N = newNode(data);
 		N->prev = L->cursor->prev;
 		N->next = L->cursor;
 		L->cursor->prev = N;
@@ -372,11 +371,13 @@ void insertAfter(List L, type data) {
 		exit(EXIT_FAILURE);
 	} else {
 		N->next = L->cursor->next;
-		L->cursor->next = N;
 		N->prev = L->cursor;
 		if (N->next != NULL) {
 			N->next->prev = N;
 		}
+		else
+			L->back = N;
+		L->cursor->next = N;
 	}
 	L->length++;
 }
@@ -385,7 +386,8 @@ void insertAfter(List L, type data) {
 // Delete the front element. Pre: length()>0
 void deleteFront(List L) {
 	Node N = NULL;
-
+	printf("Freenode1\n");
+	freeNode(&N);
 	if (L == NULL) {
 		printf("List Error: calling deleteFront() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -444,8 +446,6 @@ void deleteBack(List L) {
 // Overwrites the cursor element with x. Pre: length()>0, index()>=0
 void set(List L, long x)
 {
-	Node N = NULL;
-
 	if (L == NULL) {
 		printf("List Error: calling set() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -458,11 +458,7 @@ void set(List L, long x)
 		printf("List Error: calling set() on undefined cursor element\n");
 		exit(EXIT_FAILURE);
 	}
-	if (L->index == 0) {
-		L->front->data = x;
-	} else if (L->index == L->length) {
-		L->back->data = x;
-	} else {
+	else {
 		L->cursor->data = x;
 	}
 

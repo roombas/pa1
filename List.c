@@ -58,7 +58,7 @@ void freeNode(Node *pN) {
 
 // newList()
 // Returns reference to new empty List object.
-List newList() {
+List newList(void) {
 	List L;
 	L = malloc(sizeof(ListObj));
 	L->front = L->back = NULL;
@@ -296,7 +296,6 @@ void prepend(List L, type data) {
 		}
 	}
 	L->length++;
-	freeNode(&N);
 }
 
 // append()
@@ -317,7 +316,6 @@ void append(List L, type data) {
 		L->back = N;
 	}
 	L->length++;
-	freeNode(&N);
 }
 
 //insertBefore()
@@ -509,20 +507,16 @@ void delete(List L) {
 // of a space separated sequence of integers,
 // with front on left.
 void printList(FILE *out, List L) {
-	Node N = NULL;
 
 	if (L == NULL) {
 		printf("List Error: calling printList() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("PRINTING\n");
 
-	for (N = L->front; N != NULL; N = N->next) {
-		fprintf(out, "%ld ", N->data);
-		printf("PRINTING\n");
-		sleep(2);
+	for (moveFront(L); index(L) >= 0; moveNext(L)) {
+		fprintf(out, "%ld ", get(L));
 	}
-	printf("\n");
+		printf("\n");
 
 }
 

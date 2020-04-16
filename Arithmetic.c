@@ -92,7 +92,9 @@ int main(int argc, char *argv[]) {
 
 	/*************TEST*****************/
 
-	printf("FIRST LETTER %c \n", bigInt1[0]);
+	printf("First letter: %c\n", bigInt1[8]);
+
+	printf("WANT: \n");
 	puts(bigInt1);
 	printf("************\n");
 
@@ -111,20 +113,21 @@ int main(int argc, char *argv[]) {
 	} else if (bigInt1[0] == '+') {
 		memmove(bigInt1, bigInt1 + 1, strlen(bigInt1));
 	} else
-		printf("NO CONDITION MET\n");
+		printf("HAVE: \n");
 
-	len = strlen(bigInt1);
 	int POWER = 9;
-	char arr[POWER];
-
-	int j = 0;
+	char * arr = malloc (POWER+1 * sizeof(char));
+	len = strlen(bigInt1);
 	if (len > POWER) {
-		for (int i = 0; i < len + 1; i++) {
-
+		int j = 0;
+		for (int i = 0; i < len; i++) {
+			arr[j] = bigInt1[i];
+			j++;
 			if ((i+1) % POWER == 0) {
-				j = 0;
+				arr[j] = '\0';
 				temp = atoi(arr);
-				printf("%ld     ", temp);
+				printf("FIRST COND %ld     ", temp);
+				j = 0;
 			}
 			else if ((len - i) < POWER) {
 				int dif = len - i;
@@ -132,12 +135,11 @@ int main(int argc, char *argv[]) {
 					arr[j] = bigInt1[i];
 					i++;
 				}
+				arr[j] = '\0';
 				temp = atoi(arr);
-				printf("%ld     ", temp);
+				printf("SECOND COND %ld     ", temp);
 				break;
 			}
-			arr[j] = bigInt1[i];
-			j++;
 		}
 	} else {
 		temp = atoi(bigInt1);
@@ -146,6 +148,7 @@ int main(int argc, char *argv[]) {
 
 	/***********************************/
 
+	free(arr);
 	fclose(in);
 	fclose(out);
 

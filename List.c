@@ -8,8 +8,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<ctype.h>
+#include<string.h>
 #include "List.h"
-#define type int
 
 //contains definitions of all exported functions
 //private
@@ -296,19 +296,19 @@ void prepend(List L, type data) {
 		}
 	}
 	L->length++;
+	freeNode(&N);
 }
 
 // append()
 // Insert new element into L. If L is non-empty,
 // insertion takes place after back element.
 void append(List L, type data) {
+	Node N = newNode(data);
 
 	if (L == NULL) {
 		printf("List Error: calling append() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("NODE SIZE %lu", sizeof(NodeObj));
-	Node N = newNode(data);
 	if (isEmpty(L)) {
 		L->front = L->back = N;
 	} else {
@@ -317,12 +317,14 @@ void append(List L, type data) {
 		L->back = N;
 	}
 	L->length++;
+	freeNode(&N);
 }
 
 //insertBefore()
 // Insert new element before cursor.
 // Pre: length()>0, index()>=0
 void insertBefore(List L, type data) {
+	Node N = newNode(data);
 	if (L == NULL) {
 		printf("List Error: calling insertBefore() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -336,7 +338,6 @@ void insertBefore(List L, type data) {
 				"List Error: calling insertBefore() while cursor is undefined\n");
 		exit(EXIT_FAILURE);
 	} else {
-		Node N = newNode(data);
 		N->prev = L->cursor->prev;
 		N->next = L->cursor;
 		L->cursor->prev = N;
@@ -386,8 +387,7 @@ void insertAfter(List L, type data) {
 // Delete the front element. Pre: length()>0
 void deleteFront(List L) {
 	Node N = NULL;
-	printf("Freenode1\n");
-	freeNode(&N);
+
 	if (L == NULL) {
 		printf("List Error: calling deleteFront() on NULL List reference\n");
 		exit(EXIT_FAILURE);
@@ -515,9 +515,12 @@ void printList(FILE *out, List L) {
 		printf("List Error: calling printList() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+	printf("PRINTING\n");
 
 	for (N = L->front; N != NULL; N = N->next) {
-		fprintf(out, "%d ", N->data);
+		fprintf(out, "%ld ", N->data);
+		printf("PRINTING\n");
+		sleep(2);
 	}
 	printf("\n");
 

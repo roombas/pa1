@@ -10,6 +10,8 @@
 #include<ctype.h>
 #include<string.h>
 #include "List.h"
+#define POWER 9
+#define BASE 1000000000
 
 //contains definitions of all exported functions
 //private
@@ -71,12 +73,9 @@ List newList(void) {
 // freeList()
 // Frees all heap memory associated with List *pL, and sets *pL to NULL.
 void freeList(List *pL) {
-	int i = 0;
 	if (pL != NULL && *pL != NULL) {
 		while (!isEmpty(*pL)) {
-			printf("calling deleteFront %d\n", i);
 			deleteFront(*pL);
-			i++;
 		}
 		free(*pL);
 		*pL = NULL;
@@ -195,11 +194,13 @@ int isEmpty(List L) {
 void clear(List L) {
 	if (L == NULL) {
 		printf("List Error: calling clear() on NULL List reference\n");
-		exit(EXIT_FAILURE);
+		return;
+		//exit(EXIT_FAILURE);
 	}
 	if (isEmpty(L)) {
 		printf("List Error: calling clear() on empty List\n");
-		exit(EXIT_FAILURE);
+		return;
+		//exit(EXIT_FAILURE);
 	}
 
 	while (L->front != NULL) {
@@ -212,7 +213,7 @@ void clear(List L) {
 // If L is non-empty, sets cursor under the front element,
 // otherwise does nothing.
 void moveFront(List L) {
-	if (isEmpty(L)) {
+	if (isEmpty(L) || L == NULL) {
 		return;
 	} else {
 		L->cursor = L->front;
@@ -224,7 +225,7 @@ void moveFront(List L) {
 // If L is non-empty, sets cursor under the back element,
 // otherwise does nothing.
 void moveBack(List L) {
-	if (isEmpty(L)) {
+	if (isEmpty(L) || L == NULL) {
 		return;
 	} else {
 		L->cursor = L->back;
@@ -279,18 +280,21 @@ void moveNext(List L) {
 // Insert new element into L. If L is non-empty,
 // insertion takes place before front element.
 void prepend(List L, type data) {
-	Node N = newNode(data);
-
 	if (L == NULL) {
 		printf("List Error: calling prepend() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+
+	Node N = newNode(data);
 	if (isEmpty(L)) {
 		L->front = L->back = N;
 	} else {
-		N->next = L->front;
 		L->front->prev = N;
+		N->next = L->front;
 		L->front = N;
+		//N->next = L->front;
+		//L->front->prev = N;
+		//L->front = N;
 		if (L->index != -1) {
 			L->index++;
 		}
@@ -302,18 +306,21 @@ void prepend(List L, type data) {
 // Insert new element into L. If L is non-empty,
 // insertion takes place after back element.
 void append(List L, type data) {
-	Node N = newNode(data);
-
 	if (L == NULL) {
 		printf("List Error: calling append() on NULL List reference\n");
 		exit(EXIT_FAILURE);
 	}
+
+	Node N = newNode(data);
 	if (isEmpty(L)) {
 		L->front = L->back = N;
 	} else {
-		N->prev = L->back;
 		L->back->next = N;
+		N->prev = L->back;
 		L->back = N;
+		//N->prev = L->back;
+		//L->back->next = N;
+		//L->back = N;
 	}
 	L->length++;
 }
@@ -399,17 +406,17 @@ void deleteFront(List L) {
 		if (L->cursor == L->front) {
 			L->cursor = NULL;
 			L->index = -1;
+			freeNode(&N);
 		}
 		else if(L->cursor != NULL)
 			 L->index--;
 		L->front = N->next;
+		freeNode(&N);
 	} else{
 		N = L->back;
 		L->front = N = NULL;
 	}
-	printf("Calling freeNode\n");
 	L->length--;
-	freeNode(&N);
 }
 
 //deleteBack()
@@ -532,7 +539,13 @@ List copyList(List L) {
 		exit(EXIT_FAILURE);
 	}
 
-	List L2 = L;
+	List L2 = newList();
+	for (moveFront(L); index(L) >= 0; moveNext(L))
+	{
+		append(L2, get(L));
+	}
+	//Iterate through list, create elements for list
+
 	L2->cursor = NULL;
 	L2->index = -1;
 	return L2;

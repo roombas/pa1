@@ -266,14 +266,15 @@ void moveNext(List L) {
 	if (L == NULL) {
 		printf("Cursor Error: calling moveNext() on NULL List.\n");
 		exit(EXIT_FAILURE);
-	} else if (L->cursor != NULL && L->index != L->length) {
+	} else if (L->cursor != NULL && L->index != (L->length - 1)) {
 		L->cursor = L->cursor->next;
 		L->index++;
 	} else if (L->cursor != NULL && L->cursor->next == NULL) {
 		L->cursor = NULL;
 		L->index = -1;
-	} else
-		return;
+	}
+	return;
+
 }
 
 //prepend()
@@ -508,6 +509,19 @@ void delete(List L) {
 
 // Other operations -----------------------------------------------------------
 
+
+//find length of a long int
+int getLongLen(long getNum) {
+	int len = 0;
+	if (getNum == 0) {
+		return (1);
+	}
+	while (getNum != 0) {
+		getNum = getNum / 10;
+		len++;
+	}
+	return (len);
+}
 //printList()
 // Prints to the file pointed to by out, a
 // string representation of L consisting
@@ -520,11 +534,18 @@ void printList(FILE *out, List L) {
 		exit(EXIT_FAILURE);
 	}
 
-	for (moveFront(L); index(L) >= 0; moveNext(L)) {
-		fprintf(out, "%ld ", get(L));
+	for (moveBack(L); index(L) >= 0; movePrev(L)) {
+		if (index(L) == (length(L)) && get(L) == 0)
+			movePrev(L);
+		if (get(L) < ((BASE/10) - 1) && index(L) != length(L)) {
+			int len = POWER - getLongLen(get(L));
+			for (int i = 0; i < len; i++) {
+				fprintf(out, "%d", 0);
+			}
+		}
+		fprintf(out, "%ld", get(L));
 	}
-		printf("\n");
-
+	fprintf(out, "\n\n");
 }
 
 //copyList()
